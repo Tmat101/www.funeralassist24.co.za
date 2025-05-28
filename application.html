@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Funeral Assist 24 - Application Form</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans&family=Playfair+Display&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <header class="container header-flex" role="banner">
+    <img src="logo.jpg" alt="Funeral Assist 24 Logo" class="logo" />
+    <nav role="navigation" aria-label="Primary Navigation">
+      <ul class="nav-links">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About Us</a></li>
+        <li><a href="services.html">What We Offer</a></li>
+        <li><a href="policies.html">Policies</a></li>
+        <li><a href="contact.html">Contact Us</a></li>
+        <li><a href="application.html" aria-current="page">Application Form</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <main class="container" role="main" style="margin-top: 40px;">
+
+    <section class="hero-section" aria-label="Application Form Introduction" style="background-image: url('img/hero.jpg'); height: 300px;">
+      <div class="hero-overlay">
+        <div class="hero-content">
+          <h1>Apply for Funeral Cover</h1>
+          <p>Complete the form below to secure your peace of mind.</p>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="form-title" style="padding: 2rem 0;">
+      <h2 id="form-title" style="font-family: 'Playfair Display', serif; margin-bottom: 1rem;">Application Form</h2>
+
+      <form id="applicationForm" novalidate>
+        <fieldset>
+          <legend>Personal Information</legend>
+
+          <label for="fullName">Full Name *</label><br />
+          <input type="text" id="fullName" name="Full Name" required minlength="3" /><br /><br />
+
+          <label for="idNumber">ID Number *</label><br />
+          <input type="text" id="idNumber" name="ID Number" pattern="\d{13}" title="13 digit South African ID number" required /><br /><br />
+
+          <label for="email">Email *</label><br />
+          <input type="email" id="email" name="Email" required /><br /><br />
+
+          <label for="phone">Phone Number *</label><br />
+          <input type="tel" id="phone" name="Phone Number" pattern="^\d{10}$" title="10 digit phone number" required /><br /><br />
+        </fieldset>
+
+        <fieldset>
+          <legend>Policy Selection</legend>
+
+          <label for="policyPlan">Choose Plan *</label><br />
+          <select id="policyPlan" name="Policy Plan" required>
+            <option value="" disabled selected>Select a plan</option>
+            <option value="Basic Plan">Traditional Plan A (Silver)</option>
+            <option value="Standard Plan">Traditional Plan B (Copper) </option>
+            <option value="Premium Plan">Traditional Plan C (Emerald)</option>
+            <option value="Family Plan">Traditional Plan D (Gold)</option>
+          </select><br /><br />
+        </fieldset>
+
+        <!-- Signature Section -->
+        <fieldset style="border:none; padding:0; margin-bottom:1em;">
+          <legend><strong>Signature *</strong></legend>
+
+          <canvas id="signature-pad" style="border:1px solid #ccc; border-radius:5px; width:100%; max-width:400px; height:150px;"></canvas>
+          <br />
+          <button type="button" id="clear-signature" class="btn-primary" style="margin-top:0.5em;">Clear Signature</button>
+
+          <input type="hidden" id="signature-data" name="signatureData" required />
+          <p id="signature-error" style="color:red; display:none; margin-top:0.5em;">Please provide your signature.</p>
+        </fieldset>
+
+        <button type="submit" class="btn-primary">Submit Application</button>
+      </form>
+    </section>
+
+  </main>
+
+  <footer class="main-footer" role="contentinfo">
+    <p>Funeral Assist 24 | 703 Pretoria Main Road, Wynberg, Sandton</p>
+    <p>Trading Hours: Mon-Fri 08:00–17:00 | Sat 08:00–13:00</p>
+    <p>Contact: 082 708 2304 / 077 440 3958</p>
+	<p>Email: info@funeralassist24.co.za</p>
+    <p>&copy; 2025 Funeral Assist 24. All rights reserved.</p></p>
+  </footer>
+
+  <!-- External JS -->
+  <script src="script.js"></script>
+
+  <!-- jsPDF CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+  <script>
+    (() => {
+      const form = document.getElementById('applicationForm');
+      const signaturePad = document.getElementById('signature-pad');
+      const clearBtn = document.getElementById('clear-signature');
+      const signatureDataInput = document.getElementById('signature-data');
+      const signatureError = document.getElementById('signature-error');
+      const ctx = signaturePad.getContext('2d');
+
+      // Resize canvas for high DPI screens
+      function resizeCanvas() {
+        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+        signaturePad.width = signaturePad.offsetWidth * ratio;
+        signaturePad.height = signaturePad.offsetHeight * ratio;
+        ctx.scale(ratio, ratio);
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        clearCanvas();
+      }
+      window.addEventListener('resize', resizeCanvas);
+      resizeCanvas();
+
+      let drawing = false;
+      let lastX = 0, lastY = 0;
+
+      function clearCanvas() {
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(0, 0, signaturePad.width, signaturePad.height);
+        signatureDataInput.value = '';
+        signatureError.style.display = 'none';
+      }
+
+      function getMousePos(e) {
+        const rect = signaturePad.getBoundingClientRect();
+        return {
+          x: e.clientX - rect.left,
+          y: e.clientY - rect.top
+        };
+      }
+
+      function startDrawing(e) {
+        drawing = true;
+        const pos = getMousePos(e);
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+
+      function draw(e) {
+        if (!drawing) return;
+        const pos = getMousePos(e);
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+        lastX = pos.x;
+        lastY = pos.y;
+      }
+
+      function stopDrawing() {
+        drawing = false;
+        signatureDataInput.value = signaturePad.toDataURL();
+        if (signatureDataInput.value) {
+          signatureError.style.display = 'none';
+        }
+      }
+
+      signaturePad.addEventListener('mousedown', startDrawing);
+      signaturePad.addEventListener('mousemove', draw);
+      signaturePad.addEventListener('mouseup', stopDrawing);
+      signaturePad.addEventListener('mouseout', stopDrawing);
+
+      // Touch support
+      signaturePad.addEventListener('touchstart', e => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
+      });
+      signaturePad.addEventListener('touchmove', e => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        draw({ clientX: touch.clientX, clientY: touch.clientY });
+      });
+      signaturePad.addEventListener('touchend', e => {
+        e.preventDefault();
+        stopDrawing();
+      });
+
+      clearBtn.addEventListener('click', clearCanvas);
+
+      // Handle form submission and PDF generation
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+
+        // Check signature
+        if (!signatureDataInput.value) {
+          signatureError.style.display = 'block';
+          signaturePad.focus();
+          return;
+        } else {
+          signatureError.style.display = 'none';
+        }
+
+        // Check form validity
+        if (!form.checkValidity()) {
+          alert('Please fill out the form correctly.');
+          return;
+        }
+
+        // Prepare form data
+        const formData = new FormData(form);
+
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF();
+
+        pdf.setFontSize(18);
+        pdf.text('Funeral Assist 24 Application', 14, 20);
+        pdf.setFontSize(12);
+
+        let y = 30;
+        formData.forEach((value, key) => {
+          if (key !== 'signatureData') {
+            pdf.text(`${key}: ${value}`, 14, y);
+            y += 8;
+          }
+        });
+
+        // Add signature image
+        pdf.text('Signature:', 14, y + 8);
+        pdf.addImage(formData.get('signatureData'), 'PNG', 40, y + 12, 60, 30);
+
+        pdf.save('FuneralAssist24_Application.pdf');
+
+        form.reset();
+        clearCanvas();
+
+        alert('Application submitted successfully! Your PDF has been downloaded.');
+      });
+
+      // Initialize blank canvas background
+      clearCanvas();
+    })();
+  </script>
+
+</body>
+</html>
+

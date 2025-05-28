@@ -1,0 +1,252 @@
+/* css/style.css */
+
+:root {
+  --primary-color: #b28c5e;
+  --secondary-color: #222;
+  --text-color: #333;
+  --light-bg: #f9f9f9;
+  --font-heading: 'Playfair Display', serif;
+  --font-body: 'Open Sans', sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background-color: var(--light-bg);
+  color: var(--text-color);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* 🔧 Sticky header fix: adds top padding when header is fixed */
+body.sticky-active {
+  padding-top: 80px;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Sticky header */
+header.container.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background: white;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  z-index: 1000;
+}
+
+/* Mobile nav toggle */
+.nav-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--secondary-color);
+}
+
+@media (max-width: 768px) {
+  .nav-toggle {
+    display: block;
+  }
+  .nav-links {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    background: white;
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  }
+  .nav-links.nav-active {
+    display: flex;
+  }
+
+  /* 🔧 Mobile padding adjustment for sticky header */
+  body.sticky-active {
+    padding-top: 90px;
+  }
+}
+
+/* Input valid/invalid border colors */
+input:valid, textarea:valid, select:valid {
+  border-color: var(--primary-color);
+}
+input:invalid, textarea:invalid, select:invalid {
+  border-color: red;
+}
+
+/* Scroll animation initial states */
+.before-visible {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+}
+
+.fade-in.visible, .slide-in.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.header-flex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 0;
+  position: relative;
+  z-index: 10;
+}
+
+.logo {
+  width: 140px;
+  height: auto;
+}
+
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 25px;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-links li a {
+  text-decoration: none;
+  color: var(--secondary-color);
+  font-weight: 600;
+  font-size: 1rem;
+  transition: color 0.3s, transform 0.3s;
+}
+
+.nav-links li a:hover {
+  color: var(--primary-color);
+  transform: scale(1.05);
+}
+
+.hero-section {
+  height: 100vh;
+  background: url('../img/hero.jpg') no-repeat center center/cover;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.6);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  text-align: center;
+}
+
+.hero-content {
+  color: #fff;
+  z-index: 2;
+  max-width: 800px;
+  animation: slideIn 2s ease-out forwards;
+}
+
+.hero-content h1 {
+  font-family: var(--font-heading);
+  font-size: 3.5rem;
+  margin-bottom: 0.5em;
+  letter-spacing: 1px;
+  animation: fadeIn 2s ease-in-out;
+}
+
+.hero-content p {
+  font-size: 1.25rem;
+  margin-bottom: 2em;
+  animation: fadeIn 2s ease-in-out 0.5s;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.8em 2em;
+  border: none;
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  animation: fadeIn 2s ease-in-out 1s;
+}
+
+.btn-primary:hover {
+  background-color: #a1794e;
+  transform: translateY(-2px);
+}
+
+.main-footer {
+  background-color: var(--secondary-color);
+  color: #fff;
+  text-align: center;
+  padding: 40px 20px;
+  font-size: 0.95rem;
+  animation: fadeIn 2s ease-in;
+}
+
+.main-footer p {
+  margin: 5px 0;
+}
+
+/* Animations */
+.fade-in {
+  animation: fadeIn 2s ease-in-out;
+}
+
+.slide-in {
+  animation: slideIn 1.5s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .hero-content h1 {
+    font-size: 2.5rem;
+  }
+  .nav-links {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .header-flex {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .logo {
+    margin-bottom: 10px;
+  }
+}
+
